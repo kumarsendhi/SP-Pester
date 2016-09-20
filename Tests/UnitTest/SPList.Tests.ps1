@@ -40,26 +40,15 @@ Describe "SPList unit test" {
             Title = "My Task"
         }
         Mock Get-SPWeb {
-        $lists=@()
-        $i=New-Object System.Object
-        $i | Add-Member -MemberType NoteProperty -Name "Title" -Value "My Task"
-        $i | Add-Member -MemberType NoteProperty -Name "HasUniqueRoleAssignment" -Value $false
-        $lists +=$i
-        $i=New-Object System.Object
-        $i | Add-Member -MemberType NoteProperty -Name "Title" -Value "appdata"
-        $i | Add-Member -MemberType NoteProperty -Name "HasUniqueRoleAssignment" -Value $false
-        $lists +=$i
-        $i=New-Object System.Object
-        $i | Add-Member -MemberType NoteProperty -Name "Title" -Value "wfpub"
-        $i | Add-Member -MemberType NoteProperty -Name "HasUniqueRoleAssignment" -Value $false
-        $lists +=$i
-        return (@{
-            Title="TS1"
-            Lists=$lists
-        })}
+        $data = Get-Content 'C:\SP-Pester\Tests\MockData\SPList-Mock.xml'
+       
+        return (
+            $rssData= [System.Management.Automation.PSSerializer]::DeserializeAsList($data)
+        )}
       
        It "SPList Exists" {
-        (SPList $testParams).Title | Should Be "My Task"
+        $rssData=(SPWeb $testParams)
+        (GetSPList $testParams).Title | Should Be "My Task"
     }
     }
 

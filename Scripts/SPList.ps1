@@ -10,18 +10,20 @@ function SPWeb(){
 function GetSPList(){
     
     $i = $args[0];
-    $j = $args[1];
-    $l = $j.lists[$i.Title];
+    $j = SPWeb $i;
+    write-host $j
+    $l = $j.lists | Where { $_.Title -eq $i.Title}
     return $l
 }
 
 function SPList() {
 
     $i = $args[0];
-    $w = SPWeb $i
+    
+
 
     if($w -ne $null){
-        $l=GetSPList $i $w
+        $l=GetSPList $i
         Write-Host $l.Title
     }
 
