@@ -13,6 +13,7 @@ param(
 
 #$here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $here = $RepoRoot+'\Scripts'
+$fileName =(Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.ps1', ''
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 . "$here\$sut"
 
@@ -40,7 +41,8 @@ Describe "SPList unit test" {
             Title = "My Task"
         }
         Mock Get-SPWeb {
-        $data = Get-Content 'C:\SP-Pester\Tests\MockData\SPList-Mock.xml'
+        $MockPath = $RepoRoot+'\Tests\MockData\'+$fileName+'-Mock.xml'
+        $data = Get-Content $MockPath
        
         return (
             $rssData= [System.Management.Automation.PSSerializer]::DeserializeAsList($data)
