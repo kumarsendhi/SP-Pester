@@ -11,7 +11,7 @@ function GetSPList(){
     
     $i = $args[0];
     $j = SPWeb $i;
-    write-host $j
+    #write-host $j
     $l = $j.lists | Where { $_.Title -eq $i.Title}
     return $l
 }
@@ -34,5 +34,5 @@ url = "http://win-fhhao4r7hve/sites/TS"
 Title = "My Task"
 }
 
-SPList $testParams
+SPWeb $testParams
 

@@ -31,9 +31,10 @@ Describe "SPList unit test" {
             Title="TS1"
         })}
         It "SPWeb Exists" {
-        (SPWeb $testParams).Title | Should Be "TS1"
+        (SPWeb $testParams).Title | Should Be "TS1"   
     }
     }
+
 
      Context 'SPList Unit Test'{
          $testParams =@{
@@ -41,17 +42,22 @@ Describe "SPList unit test" {
             Title = "My Task"
         }
         Mock Get-SPWeb {
+        
         $MockPath = $RepoRoot+'\Tests\MockData\'+$fileName+'-Mock.xml'
         $data = Get-Content $MockPath
        
         return (
             $rssData= [System.Management.Automation.PSSerializer]::DeserializeAsList($data)
-        )}
+        )} -Verifiable
       
        It "SPList Exists" {
         $rssData=(SPWeb $testParams)
         (GetSPList $testParams).Title | Should Be "My Task"
+        Assert-MockCalled Get-SPWeb -Exactly 1
+        $true | Should Be $true
+        Assert-VerifiableMocks
     }
+    
     }
 
     
