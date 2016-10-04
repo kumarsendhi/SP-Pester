@@ -38,7 +38,7 @@ Let's understand what is done to solve the above problems and get seamless unit 
 
       [CmdletBinding()]
       param(
-      [string] $SharePointCmdletModule = (Join-Path $PSScriptRoot "..\Stub\Microsoft.SP.PowerShell.psm1" -Resolve)
+      [string] $SharePointCmdletModule = (Join-Path $PSScriptRoot "..\Stubs\Microsoft.SP.PowerShell.psm1" -Resolve)
       )
       $RepoRoot = (Resolve-Path $PSScriptRoot\..\..).Path
       $Global:CurrentSharePointStubModule = $SharePointCmdletModule
@@ -84,7 +84,23 @@ Let's understand what is done to solve the above problems and get seamless unit 
 
       ```
      * Create a file in **SharePoint-With-Pester\Scripts** folder, named **SPWebApp.ps1**.
-     * Production code (*SPWebApp.ps1*) and test code (*SPWebApp.**Tests**.ps1*) file names should be similar except Tests which is highlightes for Pester to work seamlessly
+     * Production code (*SPWebApp.ps1*) and test code (*SPWebApp.**Tests**.ps1*) file names should be similar except **Tests** which is highlighted for Pester to work seamlessly
+     * Paste the following code in SPWebApp.ps1.
+     ```
+      function SPWebApp{
+        $params = $args[0]
+
+        $webApplication = Get-SPWebApplication -Identity $params.Name
+        return $webApplication 
+      }
+
+      $testParams =@{
+        Name='SharePoint - 80'
+      }
+
+      SPWebApp $testParams
+
+     ```
 
 hi
 hello
