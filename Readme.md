@@ -28,10 +28,63 @@ Let's understand what is done to solve the above problems and get seamless unit 
    * Mock the entire cmdlet of SharePoint. Used this [blog][] as reference.
      * This should be done in **SharePoint server**
      * Double Click the **MockGenerator.bat** file which is located in **SharePoint-With-Pester\Tests** folder.
-     * It will generate the SharePoint Cmdlet mocks in **SharePoint-With-Pester\Stubs** folder.
+     * It will generate the SharePoint Cmdlet mocks in **SharePoint-With-Pester\Tests\Stubs** folder.
 
-2. Begin Unit Testing with [Pester][]
+2. Begin Unit Testing with [Pester][]. We will explore multiple scenario's in this sample
+   * Scenario 1: Unit Testing to check **SharePoint WebApplication** with a particular name exists.
+     * Create a file in **SharePoint-With-Pester\Tests\UnitTest** folder, named **SPWebApp.Tests.ps1**. 
+     * Paste the following code in the file.
+      ```
 
+      [CmdletBinding()]
+      param(
+      [string] $SharePointCmdletModule = (Join-Path $PSScriptRoot "..\Stub\Microsoft.SP.PowerShell.psm1" -Resolve)
+      )
+      $RepoRoot = (Resolve-Path $PSScriptRoot\..\..).Path
+      $Global:CurrentSharePointStubModule = $SharePointCmdletModule
+    
+      Remove-Module -Name "Microsoft.SharePoint.PowerShell" -Force -ErrorAction SilentlyContinue
+      Import-Module $Global:CurrentSharePointStubModule -WarningAction SilentlyContinue
+
+      $here = $RepoRoot+'\Scripts'
+      $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
+      . "$here\$sut"
+
+      Describe "SP-WebApplication Unit Test" {
+        $testParams =@{
+          Name='SharePoint - 80'
+        }
+        Context "Web Application exist"{
+          Mock Get-SPWebApplication {return (@{
+            DisplayName= $testParams.Name
+            ApplicationPool = @{ 
+              Name = "SharePoint - 80"
+              Username = "seyon\SPAdmin"
+            }
+            ContentDatabases = @(
+              @{
+                  Name = "WSS_Content"
+                  Server = "WIN-FHHAO4R7HVE"
+                }
+            )
+          })}
+          It "WebApplication with Identity  exist"{
+            $result = SPWebApp $testParams
+            $result.DisplayName | Should Be 'SharePoint - 80'
+          }
+        }
+        Context "Web Application doesn't exist"{
+          Mock Get-SPWebApplication { return $null }
+            It "WebApplication with Identity doesn't exist"{
+              $result = SPWebApp $testParams
+              $result | Should Be $null
+            }
+        }
+      }
+
+      ```
+     * Create a file in **SharePoint-With-Pester\Scripts** folder, named **SPWebApp.ps1**.
+     * Production code (*SPWebApp.ps1*) and test code (*SPWebApp.**Tests**.ps1*) file names should be similar except Tests which is highlightes for Pester to work seamlessly
 
 hi
 hello
